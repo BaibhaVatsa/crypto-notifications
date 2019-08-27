@@ -7,7 +7,7 @@ import * as MailData from "./env";
 
 createServer((request, response) => {
     let statusCode = 404;
-    try {
+    // try {
         const oauth2client = new google.auth.OAuth2(
             MailData.CLIENT_ID,
             MailData.CLIENT_SECRET,
@@ -32,7 +32,7 @@ createServer((request, response) => {
             }
         })
         
-        transporter.verify((error, success) => {
+        transporter.verify((error) => {
             if (error) {
               console.log(error);
             } else {
@@ -44,7 +44,7 @@ createServer((request, response) => {
             from: MailData.FROM,
             to: "",
             subject: "sending with node.js",
-            text: "woohoo bitches!"
+            text: "woohoo bitches! progress"
         }, (err, info) => {
             if (err) {
                 console.log(err);
@@ -56,9 +56,9 @@ createServer((request, response) => {
 
         statusCode = 200;
         response.statusCode = statusCode;
-    } catch(err) {
-        response.statusCode = statusCode;
-        console.log(err);
-    }
+    // } catch(err) {
+    //     response.statusCode = statusCode;
+    //     console.log(err);
+    // }
     response.end(request.data);
 }).listen(8000);
