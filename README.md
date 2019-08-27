@@ -1,29 +1,15 @@
 # crypto-notifications
 
-## Project setup
-```
-npm install
+Learning Web Dev with Vue.js and Node.js
+
+## starting the server
+
+```bash
+node -r esm server/server.js
 ```
 
-### Compiles and hot-reloads for development
-```
+## starting the application
+
+```bash
 npm run serve
 ```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
