@@ -22,14 +22,17 @@
       </td></tr>
       <tr><td>
       <div class="field">
-        <label>Crypto Name: <a href="https://www.example.com"><label class="infolink"></label></a></label>
+        <label>Crypto Name: <label class="infolink tooltip">
+          <p class="tooltiptext">
+            Trading names. List: <a href="https://www.example.com" target="_blank">Example.com</a>
+          </p>
+        </label></label>
         <input type="text">
       </div>
       </td></tr>
       </table>
       <div>
         <button class="button" v-on:click="logIn" :disabled="disabled" type="submit" name="login">Log In</button>
-        <button class="button" v-on:click="signUp" :disabled="disabled" type="submit" name="signup">Sign Up</button>
       </div>
     </div>
     <div v-else-if="submitted === 1">
@@ -39,7 +42,7 @@
       <br>
     </div>  
     <footer class="footer">
-      <p><a href="https://github.com/BaibhaVatsa">Code</a> | Made with ❤ by Baibhav Vatsa</p>
+      <p><a href="https://github.com/BaibhaVatsa/crypto-notifications">Code</a> | Made with ❤ by Baibhav Vatsa</p>
     </footer>  
     </center>
   </div>
@@ -52,7 +55,17 @@ export default {
     return {
       submitted: 0,
       errorCode: 404,
-      disabled: false
+    }
+  },
+  computed: {
+    disabled: function() {
+      return false;
+    },
+    email: function() {
+      return "";
+    },
+    cryptoname: function() {
+      return "";
     }
   },
   methods: {
@@ -95,7 +108,8 @@ td {
 }
 
 .field>input:focus {
-  border: 0.2em solid #5dc0a6
+  display: inline-block;
+  border: 0.2em solid #5dc0a6;
 }
 
 .header {
@@ -116,11 +130,49 @@ td {
   font-size: 1.4ex;
   line-height: 1.8ex;
   border-radius: 1.2ex;
-  margin-left: 3em;
+  margin-left: 7em;
   padding: 0.1em;
   color: #367565;
   background: white;
   border: 0.1em solid #367565;
   text-decoration: none;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  font-size: 75%;
+  left: 105%;
+  text-align: center;
+  background-color: #37977e;
+  color: #ffffff;
+  padding: 0.5em;
+  border-radius: 0.5em;
+  position: absolute;
+  z-index: 1;
+  top: -150%;
+}
+
+.tooltip .tooltiptext a {
+  color: #ffffff;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+.tooltip .tooltiptext::after {
+  content: " ";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  margin-top: -0.5em;
+  border-width: 0.5em;
+  border-style: solid;
+  border-color: transparent #37977e transparent transparent;
 }
 </style>
