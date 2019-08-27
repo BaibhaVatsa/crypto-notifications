@@ -11,13 +11,13 @@
       <tr><td>
       <div class="field">
         <label>Name: </label>
-        <input type="text">
+        <input type="text" v-model.trim="username" name="username" placeholder="John Doe">
       </div>
       </td></tr>
       <tr><td>
       <div class="field">
         <label>E-mail: </label>
-        <input type="text">
+        <input type="text" v-model.trim="email" name="email" placeholder="abc@example.com">
       </div>
       </td></tr>
       <tr><td>
@@ -27,12 +27,12 @@
             Trading names. List: <a href="https://www.example.com" target="_blank">Example.com</a>
           </p>
         </label></label>
-        <input type="text">
+        <input type="text" v-model.trim="crypto" name="crypto" placeholder="BTC">
       </div>
       </td></tr>
       </table>
       <div>
-        <button class="button" v-on:click="logIn" :disabled="disabled" type="submit" name="login">Log In</button>
+        <button v-bind:class="buttonObject" v-on:click="submitForm" :disabled="disabled" type="submit" name="login">Log In</button>
       </div>
     </div>
     <div v-else-if="submitted === 1">
@@ -50,27 +50,56 @@
 
 <script>
 export default {
-  name: 'app',
+  name: "app",
   data() {
     return {
       submitted: 0,
-      errorCode: 404,
+      errorCode: 0,
+      username: "",
+      email: "",
+      crypto: "",
+      cryptoList: ["BTC", "ETH"]
     }
   },
   computed: {
     disabled: function() {
-      return false;
+      return !(this.validUsername && this.validEmail && this.validCrypto);
     },
-    email: function() {
-      return "";
+    validUsername: function() {
+      if(this.username.length === 0) {
+        return false;
+      }
+      // eslint-disable-next-line
+      var alpha = /^[a-zA-Z-,]+(\s{0,1}[a-zA-Z-, ])*$/;
+      return this.username.match(alpha);
     },
-    cryptoname: function() {
-      return "";
+    validEmail: function() {
+      if(this.email.length === 0) {
+        return false;
+      }
+      // eslint-disable-next-line
+      var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,4})+$/;
+      return this.email.match(mailformat);
+    },
+    validCrypto: function() {
+      if(this.crypto.length === 0) {
+        return false;
+      }
+      return this.cryptoList.indexOf(this.crypto) !== -1;
+    },
+    buttonObject: function() {
+      return {
+        disabledButton: this.disabled,
+        enabledButton: !this.disabled
+      }
     }
   },
   methods: {
     submitForm: function() {
-      this.submitted = 1;
+      let data = {};
+      data.username = this.username;
+      data.email = this.email;
+      data.crypto = this.crypto;
     }
   }
 }
@@ -174,5 +203,23 @@ td {
   border-width: 0.5em;
   border-style: solid;
   border-color: transparent #37977e transparent transparent;
+}
+
+.disabledButton {
+  padding: 0.6em;
+  margin-top: 4em;
+  background-color: #afb8b5;
+  color: #333232;
+  border-radius: 0.2em;
+  border-color: transparent;
+}
+
+.enabledButton {
+  padding: 0.6em;
+  margin-top: 4em;
+  background-color: #5dc0a6;
+  color: #ffffff;
+  border-radius: 0.2em;
+  border-color: transparent;
 }
 </style>
