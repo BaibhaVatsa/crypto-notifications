@@ -6,6 +6,8 @@ import { google } from "googleapis";
 import * as MailData from "./env";
 import User from "./models/User";
 
+let users = []
+
 createServer((request, response) => {
     try {
         console.log("Request received. Type: " + request.method)
@@ -16,9 +18,9 @@ createServer((request, response) => {
             
             request.on("end", () => {
                 let data = JSON.parse(body);
-                var this_user = new User(data.username, data.email, data.crypto, data.min, data.max);
-                this_user.print()
-                console.log(data);
+                let t_user = new User(data.username, data.email, data.crypto, data.min, data.max);
+                t_user.print()
+                users.push(t_user)
             })
 
             const oauth2client = new google.auth.OAuth2(
@@ -55,26 +57,24 @@ createServer((request, response) => {
 
             transporter.sendMail({
                 from: MailData.FROM,
-                to: this_user.getEmail(),
-                subject: this_user.getSubject(),
-                text: this_user.getBody()
+                to: users[0].getEmail(),
+                subject: users[0].getSubject(),
+                text: users[0].getBody()
             }, (err, info) => {
                 if (err) {
                     console.log(err);
                 } else {
-                    console.log("Email sent to " + this_user.getEmail() + ": " + info.response);
+                    console.log("Email sent to " + users[0].getEmail() + ": " + info.response);
                 }
                 transporter.close();
             });
-
-            let statusCode = 200;
-            response.statusCode = statusCode;
+            response.statusCode = 200;
         } else {
-
+            // return error
         }
     } catch(err) {
-        response.statusCode = statusCode;
+        response.statusCode = 404;
         console.log(err);
     }
-    response.end(request.data);
+    response.end();
 }).listen(8000);

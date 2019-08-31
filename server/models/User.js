@@ -5,11 +5,11 @@ export default class User {
         this.crypto = crypto;
         this.min = min;
         this.max = max;
-        this,current_price = max - 1;
+        this.current_price = max - 1;
     }
 
     print() {
-        console.log("Name: " + this.username + "  Email: " + this.email + "  Crypto: " + this.crypto + " Range: " + this.min + " to " + this.max);
+        console.log("Name: " + this.username + "  Email: " + this.email + "  Crypto: " + this.crypto + " Range: " + this.min + " to " + this.max + " Current Price: " + this.current_price);
     }
 
     getEmail() {
