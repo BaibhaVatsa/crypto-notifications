@@ -8,6 +8,7 @@ import User from "./models/User";
 
 createServer((request, response) => {
     try {
+        console.log("Request received. Type: " + request.method)
         if (request.method == "POST") {
 
             let body = "";
@@ -15,10 +16,8 @@ createServer((request, response) => {
             
             request.on("end", () => {
                 let data = JSON.parse(body);
-                // users.push(new User(data["username"], ));
-                // for (let user in users) {
-                    // user.print();
-                // }
+                var this_user = new User(data.username, data.email, data.crypto, data.min, data.max);
+                this_user.print()
                 console.log(data);
             })
 
@@ -56,14 +55,14 @@ createServer((request, response) => {
 
             transporter.sendMail({
                 from: MailData.FROM,
-                to: "",
-                subject: "hi",
-                text: "debugging in progress"
+                to: this_user.getEmail(),
+                subject: this_user.getSubject(),
+                text: this_user.getBody()
             }, (err, info) => {
                 if (err) {
                     console.log(err);
                 } else {
-                    console.log("Email sent: " + info.response);
+                    console.log("Email sent to " + this_user.getEmail() + ": " + info.response);
                 }
                 transporter.close();
             });

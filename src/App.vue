@@ -96,17 +96,22 @@ export default {
   },
   methods: {
     submitForm: function() {
-      let request = new XMLHttpRequest();
-      request.open("POST", "http://127.0.0.1:8000", true);
-      request.withCredentials = true;
-      request.setRequestHeader("Content-Type", "application/json");
-      request.send(JSON.stringify({
-        username: this.username,
-        email: this.email,
-        crypto: this.crypto,
-        min: 0,
-        max: 1000
-      }));
+      try {
+        fetch("http://127.0.0.1:8000", {
+          method: "POST",
+          body: JSON.stringify({
+            username: this.username,
+            email: this.email,
+            crypto: this.crypto,
+            min: 0,
+            max: 1000
+          })
+        }).then(() => {
+          this.submitted = 1;
+        })
+      } catch(err) {
+        this.submitted = -1;
+      }
     }
   }
 }
