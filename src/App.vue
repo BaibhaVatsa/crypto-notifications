@@ -11,13 +11,13 @@
       <tr><td>
       <div class="field">
         <label>Name: </label>
-        <input type="text" v-model.trim="username" name="username" placeholder="John Doe">
+        <input type="text" v-bind:class="nameInput" v-model.trim="username" name="username" placeholder="John Doe">
       </div>
       </td></tr>
       <tr><td>
       <div class="field">
         <label>E-mail: </label>
-        <input type="text" v-model.trim="email" name="email" placeholder="abc@example.com">
+        <input type="text" v-bind:class="emailInput" v-model.trim="email" name="email" placeholder="abc@example.com">
       </div>
       </td></tr>
       <tr><td>
@@ -27,12 +27,22 @@
             Trading names. List: <a href="https://www.example.com" target="_blank">Example.com</a>
           </p>
         </label></label>
-        <input type="text" v-model.trim="crypto" name="crypto" placeholder="BTC">
+        <input type="text" v-bind:class="cryptoInput" v-model.trim="crypto" name="crypto" placeholder="BTC">
+      </div>
+      </td></tr>
+      <tr><td>
+      <div class="field">
+        <label>Min ($): </label>
+        <input type="text" v-bind:class="minInput" v-model.trim="min" name="min" placeholder="100">
+      </div>
+      <div class="field">
+        <label>Max ($): </label>
+        <input type="text" v-bind:class="maxInput" v-model.trim="max" name="max" placeholder="10000">
       </div>
       </td></tr>
       </table>
       <div>
-        <button v-bind:class="buttonObject" v-on:click="submitForm" :disabled="disabled" type="submit" name="login">Log In</button>
+        <button v-bind:class="buttonObject" class="button" v-on:click="submitForm" :disabled="disabled" type="submit" name="login">Log In</button>
       </div>
     </div>
     <div v-else-if="submitted === 1">
@@ -58,12 +68,14 @@ export default {
       username: "",
       email: "",
       crypto: "",
-      cryptoList: ["BTC", "ETH"]
+      cryptoList: ["BTC", "ETH"],
+      min: "",
+      max: ""
     }
   },
   computed: {
     disabled: function() {
-      return !(this.validUsername && this.validEmail && this.validCrypto);
+      return !(this.validUsername && this.validEmail && this.validCrypto && this.validMin && this.validMax);
     },
     validUsername: function() {
       if(this.username.length === 0) {
@@ -92,9 +104,56 @@ export default {
         disabledButton: this.disabled,
         enabledButton: !this.disabled
       }
+    },
+    nameInput: function() {
+      return this.borderInput(this.validUsername);
+    },
+    emailInput: function() {
+      return this.borderInput(this.validEmail);
+    },
+    cryptoInput: function() {
+      return this.borderInput(this.validCrypto);  
+    },
+    minInput: function() {
+      return this.borderInput(this.validMin);
+    },
+    maxInput: function() {
+      return this.borderInput(this.validMax);
+    },
+    borderInput: function(condition) {
+      return {
+        greenBorder: condition,
+        redBorder: !condition
+      }
     }
   },
   methods: {
+    validMin: function() {
+      if (this.min.length === 0) {
+        return false;
+      }
+      try {
+        this.min = parseInt(this.min);
+        return this.min >= 0;
+      } catch(err) {
+        return false;
+      }
+    },
+    validMax: function() {
+      if (this.max.length === 0) {
+        return false;
+      }
+      try {
+        this.max = parseInt(this.max);
+        if (typeof(this.min) === "number") {
+          return this.max > this.min;
+        } else {
+          return this.max >= 0;
+        }
+      } catch(err) {
+        return false;
+      }
+    },
     submitForm: function() {
       try {
         fetch("http://127.0.0.1:8000", {
@@ -103,8 +162,8 @@ export default {
             username: this.username,
             email: this.email,
             crypto: this.crypto,
-            min: 0,
-            max: 1000
+            min: this.min,
+            max: this.max
           })
         }).then(() => {
           this.submitted = 1;
@@ -148,9 +207,12 @@ td {
   margin-top: 0.2em;
 }
 
-.field>input:focus {
-  display: inline-block;
+.greenBorder:focus {
   border: 0.2em solid #5dc0a6;
+}
+
+.redBorder:focus {
+  border: 0.2em solid #ef4b4b;
 }
 
 .header {
@@ -217,21 +279,25 @@ td {
   border-color: transparent #37977e transparent transparent;
 }
 
-.disabledButton {
+.button {
   padding: 0.6em;
-  margin-top: 4em;
-  background-color: #afb8b5;
-  color: #333232;
+  margin-top: 3em;
   border-radius: 0.2em;
   border-color: transparent;
 }
 
+.disabledButton {
+  background-color: #afb8b5;
+  color: #333232;
+}
+
+.enabledButton:hover {
+  background-color: #3d7c6b;
+  color: #ffffff;
+}
+
 .enabledButton {
-  padding: 0.6em;
-  margin-top: 4em;
   background-color: #5dc0a6;
   color: #ffffff;
-  border-radius: 0.2em;
-  border-color: transparent;
 }
 </style>
