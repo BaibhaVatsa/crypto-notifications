@@ -152,6 +152,7 @@ export default {
       try {
         fetch("http://127.0.0.1:8000", {
           method: "POST",
+          credentials: "same-origin",
           body: JSON.stringify({
             username: this.username,
             email: this.email,
@@ -159,11 +160,13 @@ export default {
             min: this.min,
             max: this.max
           })
+        }).then((response) => {
+          if (response.ok) {
+            this.submitted = 1;
+          } else {
+            this.submitted = -1;
+          }
         })
-        // .then(() => {
-        //   this.submitted = 1;
-        // })
-        this.submitted = 1;
       } catch(err) {
         this.submitted = -1;
       }

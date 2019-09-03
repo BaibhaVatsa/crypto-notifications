@@ -43,8 +43,7 @@ function checkForNewVals() {
         } else {
             console.log("Server is ready to take our messages");
 
-            for(let i = 0; i < users.length; i += 1) {
-                let user = users[i];
+            for(let user of users) {
                 transporter.sendMail({
                     from: MailData.FROM,
                     to: user.getEmail(),
