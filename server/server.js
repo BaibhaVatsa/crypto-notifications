@@ -3,10 +3,15 @@
 import { createServer } from "http";
 import { createTransport } from "nodemailer";
 import { google } from "googleapis";
+import { Worker } from "worker_threads";
 import * as MailData from "./env";
 import User from "./models/User";
 
 let users = []
+
+const worker = new Worker("./worker.js",);
+worker.on("message", message => console.log(message));
+worker.on("error", error => console.log(error))
 
 createServer((request, response) => {
     try {
