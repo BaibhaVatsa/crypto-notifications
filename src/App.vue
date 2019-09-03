@@ -120,12 +120,6 @@ export default {
     maxInput: function() {
       return this.borderInput(this.validMax);
     },
-    borderInput: function(condition) {
-      return {
-        greenBorder: condition,
-        redBorder: !condition
-      }
-    }
   },
   methods: {
     validMin: function() {
@@ -165,11 +159,19 @@ export default {
             min: this.min,
             max: this.max
           })
-        }).then(() => {
-          this.submitted = 1;
         })
+        // .then(() => {
+        //   this.submitted = 1;
+        // })
+        this.submitted = 1;
       } catch(err) {
         this.submitted = -1;
+      }
+    },
+    borderInput: function(condition) {
+      return {
+        greenBorder: condition,
+        redBorder: !condition
       }
     }
   }
