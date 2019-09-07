@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@vue/cli": "^3.11.0",
+    "coingecko-api": "^1.0.5",
     "core-js": "^2.6.5",
     "esm": "^3.2.25",
     "googleapis": "^42.0.0",

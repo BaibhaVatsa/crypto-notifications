@@ -5,8 +5,10 @@ import User from "./models/User";
 import { createTransport } from "nodemailer";
 import { google } from "googleapis";
 import * as MailData from "./env";
+const CoinGecko = require("coingecko-api");
 
 let users = []
+let coins = []
 
 parentPort.on("message", (message) => {
     users = JSON.parse(message).map((data) => new User(data.username, data.email, data.crypto, data.min, data.max));
@@ -36,30 +38,47 @@ let transporter = createTransport({
     }
 })
 
-function checkForNewVals() {
-    transporter.verify((error) => {
-        if (error) {
-            console.log(error);
-        } else {
-            console.log("Server is ready to take our messages");
+const CoinGeckoClient = new CoinGecko();
 
-            for(let user of users) {
-                transporter.sendMail({
-                    from: MailData.FROM,
-                    to: user.getEmail(),
-                    subject: user.getSubject(),
-                    text: user.getBody()
-                }, (err, info) => {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        console.log("Email sent to " + user.getEmail() + ": " + info.response);
-                    }
-                });
-                transporter.close();
-            }
-        }
+CoinGeckoClient.coins.list()
+.then((response) => {
+    coins = response.data;
+});
+
+function getCurrentPrice(user) {
+    CoinGeckoClient.coins.fetch(user.crypto)
+    .then((response) => {
+        let current_price = response.data.market_data.current_price.usd;
+        user.setCurrentPrice(current_price);
+        return current_price > user.getMax() || current_price < user.getMin();
     });
 }
 
-setInterval(checkForNewVals, 5000);
+function sendIfNewVals() {
+    CoinGeckoClient.ping()
+    .then(
+        transporter.verify()
+        .then(() => {
+            for(let user of users) {
+                if (getCurrentPrice(user)) {
+                    transporter.sendMail({
+                    from: MailData.FROM,
+                            to: user.getEmail(),
+                            subject: user.getSubject(),
+                            text: user.getBody()
+                        }, (err, info) => {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                console.log("Email sent to " + user.getEmail() + ": " + info.response);
+                            }
+                        });
+                        transporter.close();
+                    }
+                }
+            }
+        )
+    );
+}
+
+setInterval(sendIfNewVals, 5000);

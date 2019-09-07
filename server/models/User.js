@@ -23,4 +23,16 @@ export default class User {
     getSubject() {
         return "Crypto Notification for " + this.crypto;
     }
+
+    getCrypto() {
+        return this.crypto;
+    }
+
+    getMin() {
+        return this.min;
+    }
+
+    getMax() {
+        return this.max;
+    }
 }
