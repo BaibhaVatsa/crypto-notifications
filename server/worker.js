@@ -45,27 +45,32 @@ CoinGeckoClient.coins.list()
     coins = response.data;
 });
 
-function getCurrentPrice(user) {
-    CoinGeckoClient.coins.fetch(user.crypto)
-    .then((response) => {
-        let current_price = response.data.market_data.current_price.usd;
-        user.setCurrentPrice(current_price);
-        return current_price > user.getMax() || current_price < user.getMin();
-    });
-}
-
 function sendIfNewVals() {
     CoinGeckoClient.ping()
     .then(
         transporter.verify()
         .then(() => {
             for(let user of users) {
-                if (getCurrentPrice(user)) {
-                    transporter.sendMail({
-                    from: MailData.FROM,
-                            to: user.getEmail(),
-                            subject: user.getSubject(),
-                            text: user.getBody()
+                CoinGeckoClient.coins.fetch(user.getCrypto())
+                .then((response) => {
+                    let current_price = response.data.market_data.current_price.usd;
+                    user.setCurrentPrice(current_price);
+                    // console.log(user.getCrypto())
+                    // console.log(user.getCurrentPrice())
+                    // console.log(current_price);
+                    // console.log("Max: " + user.getMax() + " Min: " + user.getMin());
+                    // console.log(current_price > user.getMax() || current_price < user.getMin());
+                    return current_price > user.getMax() || current_price < user.getMin();
+                })
+                .then((result) => {
+                    // console.log(result+"\n")
+                    if (result) {
+                        // console.log(user.getBody());
+                        transporter.sendMail({
+                        from: MailData.FROM,
+                                to: user.getEmail(),
+                                subject: user.getSubject(),
+                                text: user.getBody()
                         }, (err, info) => {
                             if (err) {
                                 console.log(err);
@@ -75,9 +80,9 @@ function sendIfNewVals() {
                         });
                         transporter.close();
                     }
-                }
+                });
             }
-        )
+        })
     );
 }
 

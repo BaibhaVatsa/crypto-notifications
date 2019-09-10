@@ -68,7 +68,7 @@ export default {
       username: "",
       email: "",
       crypto: "",
-      cryptoList: ["BTC", "ETH"],
+      cryptoList: ["bitcoin", "ETH"],
       min: "",
       max: ""
     }

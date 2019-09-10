@@ -6,6 +6,7 @@ export default class User {
         this.min = min;
         this.max = max;
         this.current_price = max - 1;
+        this.delay = 0;
     }
 
     print() {
@@ -34,5 +35,17 @@ export default class User {
 
     getMax() {
         return this.max;
+    }
+
+    getCurrentPrice() {
+        return this.current_price;
+    }
+
+    setCurrentPrice(new_current_price) {
+        this.current_price = new_current_price;
+    }
+
+    delayAgain() {
+        this.delay += 1;
     }
 }
