@@ -149,7 +149,6 @@ export default {
       }
     },
     submitForm: function() {
-      try {
         fetch("http://127.0.0.1:8000", {
           method: "POST",
           credentials: "same-origin",
@@ -161,15 +160,16 @@ export default {
             max: this.max
           })
         }).then((response) => {
-          if (response.ok) {
-            this.submitted = 1;
-          } else {
+          if (response.status !== 200) {
+            this.errorCode = response.status;
             this.submitted = -1;
+          } else {
+            this.submitted = 1;
           }
-        })
-      } catch(err) {
-        this.submitted = -1;
-      }
+        }).catch((err) =>{
+          this.errorCode = err;
+          this.submitted = -1;
+      })
     },
     borderInput: function(condition) {
       return {
