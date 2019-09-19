@@ -8,7 +8,6 @@ import * as MailData from "./env";
 const CoinGecko = require("coingecko-api");
 
 let users = []
-let coins = []
 
 parentPort.on("message", (message) => {
     users = JSON.parse(message).map((data) => new User(data.username, data.email, data.crypto, data.min, data.max));
@@ -40,50 +39,37 @@ let transporter = createTransport({
 
 const CoinGeckoClient = new CoinGecko();
 
-CoinGeckoClient.coins.list()
-.then((response) => {
-    coins = response.data;
-});
-
 function sendIfNewVals() {
     CoinGeckoClient.ping()
-    .then(
-        transporter.verify()
-        .then(() => {
-            for(let user of users) {
-                CoinGeckoClient.coins.fetch(user.getCrypto())
-                .then((response) => {
-                    let current_price = response.data.market_data.current_price.usd;
-                    user.setCurrentPrice(current_price);
-                    // console.log(user.getCrypto())
-                    // console.log(user.getCurrentPrice())
-                    // console.log(current_price);
-                    // console.log("Max: " + user.getMax() + " Min: " + user.getMin());
-                    // console.log(current_price > user.getMax() || current_price < user.getMin());
-                    return current_price > user.getMax() || current_price < user.getMin();
-                })
-                .then((result) => {
-                    // console.log(result+"\n")
-                    if (result) {
-                        // console.log(user.getBody());
-                        transporter.sendMail({
-                        from: MailData.FROM,
+    .then((response) => {
+        if (response.ok) {
+            transporter.verify()
+            .then(async (response) => {
+                if (response.ok) {
+                    for(let user of users) {
+                        await CoinGeckoClient.coins.fetch(user.getCrypto());
+                        let current_price = response.data.market_data.current_price.usd;
+                        user.setCurrentPrice(current_price);
+                        if (current_price > user.getMax() || current_price < user.getMin()) {
+                            transporter.sendMail({
+                                from: MailData.FROM,
                                 to: user.getEmail(),
                                 subject: user.getSubject(),
                                 text: user.getBody()
-                        }, (err, info) => {
-                            if (err) {
-                                console.log(err);
-                            } else {
-                                console.log("Email sent to " + user.getEmail() + ": " + info.response);
-                            }
-                        });
-                        transporter.close();
+                            }, (err, info) => {
+                                if (err) {
+                                    console.log(err);
+                                } else {
+                                    console.log("Email sent to " + user.getEmail() + ": " + info.response);
+                                }
+                            });
+                            transporter.close();
+                        }
                     }
-                });
-            }
-        })
-    );
+                }
+            })
+        }
+    });
 }
 
 setInterval(sendIfNewVals, 5000);
